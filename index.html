@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#6C5CE7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TaskFlow">
+    <title>Make use of your time</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- التحقق من التسجيل -->
+    <script>
+        (function() {
+            const userProfile = localStorage.getItem('userProfile');
+            if (!userProfile || !JSON.parse(userProfile).onboarded) {
+                window.location.href = "onboarding.html";
+                return;
+            }
+        })();
+    </script>
+
+    <!-- شاشة التحميل -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">
+            <div class="logo-icon">✦</div>
+            <h1>TaskFlow</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- شريط التنقل السفلي -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="home">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                </div>
+                <span>الرئيسية</span>
+            </button>
+            <button class="nav-item" data-tab="tasks">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.5 12H9v-4.5H7.5V9h3v6zm5.5 0h-4v-1.5h4V15zm0-3h-4v-1.5h4V12z"/></svg>
+                </div>
+                <span>المهام</span>
+            </button>
+            <button class="nav-item nav-center" data-tab="timer">
+                <div class="nav-icon-center">
+                    <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+                </div>
+                <span>مؤقت</span>
+            </button>
+            <button class="nav-item" data-tab="habits">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <span>العادات</span>
+            </button>
+            <button class="nav-item" data-tab="calendar">
+                <div class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                </div>
+                <span>الرزنامة</span>
+            </button>
+        </nav>
+
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- الصفحة الرئيسية -->
+            <section class="page active" id="home-page">
+                <header class="page-header">
+                    <div class="greeting">
+                        <h2 id="greetingTitle">مرحباً! 👋</h2>
+                        <p class="date-display" id="dateDisplay"></p>
+                    </div>
+                    <div class="avatar" id="avatarBtn" style="cursor: pointer;">
+                        <img id="userAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236C5CE7' d='M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .66.54 1.2 1.2 1.2h16.8c.66 0 1.2-.54 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z'/%3E%3C/svg%3E" alt="Avatar">
+                    </div>
+                </header>
+
+                <div class="quick-stats">
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF8E8E)">
+                            <span>📋</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalTasks">0</span>
+                            <span class="stat-label">مهمة</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4ECDC4, #44B5AD)">
+                            <span>✅</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="doneTasks">0</span>
+                            <span class="stat-label">مكتملة</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #FFD93D, #FFB830)">
+                            <span>🔥</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="streakDays">0</span>
+                            <span class="stat-label">يوم</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card glass">
+                    <div class="section-header">
+                        <h3>مهام اليوم</h3>
+                        <button class="btn-text" onclick="switchTab('tasks')">عرض الكل</button>
+                    </div>
+                    <div class="today-tasks" id="todayTasksPreview"></div>
+                </div>
+
+                <div class="section-card glass">
+                    <div class="section-header">
+                        <h3>عادات اليوم</h3>
+                        <button class="btn-text" onclick="switchTab('habits')">تتبع العادات</button>
+                    </div>
+                    <div class="habits-preview" id="habitsPreview"></div>
+                </div>
+            </section>
+
+            <!-- صفحة المهام -->
+            <section class="page" id="tasks-page">
+                <header class="page-header">
+                    <h2>المهام</h2>
+                    <button class="btn-icon" onclick="openTaskModal()">
+                        <span>+</span>
+                    </button>
+                </header>
+
+                <div class="filter-chips">
+                    <button class="chip active" data-filter="all">الكل</button>
+                    <button class="chip" data-filter="pending">قيد الانتظار</button>
+                    <button class="chip" data-filter="completed">مكتملة</button>
+                </div>
+
+                <div class="tasks-container" id="tasksContainer"></div>
+            </section>
+
+            <!-- صفحة المؤقت -->
+            <section class="page" id="timer-page">
+                <div class="timer-hero">
+                    <div class="timer-circle" id="timerCircle">
+                        <svg viewBox="0 0 200 200">
+                            <circle cx="100" cy="100" r="90" class="timer-bg"/>
+                            <circle cx="100" cy="100" r="90" class="timer-progress" id="timerProgress"/>
+                        </svg>
+                        <div class="timer-display" id="timerDisplay">25:00</div>
+                    </div>
+                    
+                    <div class="timer-presets">
+                        <button class="preset-btn" onclick="setPresetTimer(25)">25 د</button>
+                        <button class="preset-btn active" onclick="setPresetTimer(45)">45 د</button>
+                        <button class="preset-btn" onclick="setPresetTimer(60)">60 د</button>
+                    </div>
+
+                    <div class="custom-time">
+                        <input type="number" id="customMinutes" placeholder="دقائق مخصصة" min="1" max="120">
+                    </div>
+
+                    <button class="btn-primary btn-large" id="timerStartBtn" onclick="toggleTimer()">
+                        <span>▶ بدء المؤقت</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- صفحة العادات -->
+            <section class="page" id="habits-page">
+                <header class="page-header">
+                    <h2>العادات</h2>
+                    <button class="btn-icon" onclick="openHabitModal()">
+                        <span>+</span>
+                    </button>
+                </header>
+
+                <div class="habits-grid" id="habitsGrid"></div>
+            </section>
+
+            <!-- صفحة الرزنامة -->
+            <section class="page" id="calendar-page">
+                <div class="calendar-hero">
+                    <div class="calendar-nav">
+                        <button class="btn-icon" onclick="navigateMonth(-1)">‹</button>
+                        <h3 id="monthDisplay"></h3>
+                        <button class="btn-icon" onclick="navigateMonth(1)">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <span>أحد</span><span>إثنين</span><span>ثلاثاء</span>
+                        <span>أربعاء</span><span>خميس</span><span>جمعة</span><span>سبت</span>
+                    </div>
+                    <div class="calendar-days" id="calendarDays"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- نافذة إضافة مهمة -->
+        <div class="modal" id="taskModal">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <h3>مهمة جديدة</h3>
+                    <button class="btn-icon" onclick="closeTaskModal()">✕</button>
+                </div>
+                <input type="text" id="taskTitleInput" placeholder="عنوان المهمة" class="input-field">
+                <textarea id="taskDescInput" placeholder="وصف المهمة (اختياري)" class="input-field"></textarea>
+                <div class="input-row">
+                    <input type="date" id="taskDateInput" class="input-field">
+                    <select id="taskPriorityInput" class="input-field">
+                        <option value="low">⚪ منخفضة</option>
+                        <option value="medium" selected>🟡 متوسطة</option>
+                        <option value="high">🔴 عالية</option>
+                    </select>
+                </div>
+                <button class="btn-primary btn-full" onclick="addTaskFromModal()">إضافة المهمة</button>
+            </div>
+        </div>
+
+        <!-- نافذة إضافة عادة -->
+        <div class="modal" id="habitModal">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <h3>عادة جديدة</h3>
+                    <button class="btn-icon" onclick="closeHabitModal()">✕</button>
+                </div>
+                <input type="text" id="habitNameInput" placeholder="اسم العادة" class="input-field">
+                <select id="habitFreqInput" class="input-field">
+                    <option value="daily">🔄 يومياً</option>
+                    <option value="weekly">📅 أسبوعياً</option>
+                </select>
+                <div class="color-picker" id="habitColorPicker">
+                    <button class="color-option active" data-color="#FF6B6B" style="background: #FF6B6B"></button>
+                    <button class="color-option" data-color="#4ECDC4" style="background: #4ECDC4"></button>
+                    <button class="color-option" data-color="#45B7D1" style="background: #45B7D1"></button>
+                    <button class="color-option" data-color="#96CEB4" style="background: #96CEB4"></button>
+                    <button class="color-option" data-color="#FFEAA7" style="background: #FFEAA7"></button>
+                    <button class="color-option" data-color="#DDA0DD" style="background: #DDA0DD"></button>
+                </div>
+                <button class="btn-primary btn-full" onclick="addHabitFromModal()">إضافة العادة</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
