@@ -4,252 +4,1475 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#6C5CE7">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TaskFlow">
-    <title>Make use of your time</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>استغل وقتك - TaskFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C5CE7;
+            --primary-dark: #5a4bd1;
+            --primary-light: #a29bfe;
+            --success: #00b894;
+            --danger: #ff6b6b;
+            --warning: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
+            --glass-dark: rgba(255, 255, 255, 0.85);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* ========== شاشة التحميل ========== */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .splash-logo {
+            text-align: center;
+            color: white;
+        }
+        .logo-icon {
+            font-size: 60px;
+            animation: pulse 2s infinite;
+        }
+        .splash-logo h1 {
+            font-size: 36px;
+            margin: 20px 0;
+        }
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+        .loading-progress {
+            width: 0%;
+            height: 100%;
+            background: white;
+            animation: loading 2s ease-in-out forwards;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes loading {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ========== التطبيق الرئيسي ========== */
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            padding-bottom: 85px;
+        }
+
+        /* شريط التنقل */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            border-radius: 30px 30px 0 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: all 0.3s;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+        .nav-center {
+            margin-top: -20px;
+        }
+        .nav-icon-center {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+        .nav-icon-center svg {
+            width: 28px;
+            fill: white;
+        }
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* الأقسام */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* رأس الصفحة */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            color: white;
+        }
+        .page-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .greeting h2 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+        .date-display {
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid white;
+            cursor: pointer;
+            background: #ddd;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* الإحصائيات */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            padding: 12px 6px;
+            text-align: center;
+            background: var(--glass);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .stat-card:active {
+            transform: scale(0.95);
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* البطاقات */
+        .section-card {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* المهام */
+        .tasks-container, .habits-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .task-item {
+            background: var(--glass);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .task-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        .task-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+        }
+        .task-content {
+            flex: 1;
+            cursor: pointer;
+        }
+        .task-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .task-meta {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* العادات */
+        .habit-card {
+            background: var(--primary);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: white;
+            position: relative;
+        }
+        .habit-info {
+            flex: 1;
+        }
+        .habit-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .habit-streak {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .habit-check {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .habit-check.done {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .habit-delete {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* المؤقت */
+        .timer-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .timer-circle {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin-bottom: 30px;
+        }
+        .timer-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 8;
+        }
+        .timer-progress {
+            fill: none;
+            stroke: white;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+        }
+        .timer-presets {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .preset-btn {
+            padding: 10px 24px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .preset-btn.active {
+            background: white;
+            color: var(--primary);
+            border-color: white;
+        }
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: var(--glass);
+            color: var(--primary);
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* التقويم */
+        .calendar-hero {
+            background: var(--glass);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .calendar-nav h3 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #666;
+        }
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .calendar-day.today {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* نافذة الإضافة */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 380px;
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #eee;
+            border-radius: 16px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* رسالة منبثقة */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            z-index: 1000;
+            white-space: nowrap;
+            animation: toastUp 0.3s ease;
+        }
+        @keyframes toastUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* صفحة التسجيل */
+        .onboarding-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .onboarding-card {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .lang-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            background: rgba(108, 92, 231, 0.1);
+            gap: 12px;
+        }
+        .lang-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: #6C5CE7;
+        }
+        .lang-btn.active {
+            background: #6C5CE7;
+            color: white;
+        }
+        .form-content {
+            padding: 24px 28px 40px;
+        }
+        .logo-area {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .logo-area h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #6C5CE7, #a29bfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .avatar-preview {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #e0d7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-placeholder {
+            font-size: 52px;
+        }
+        .avatar-actions {
+            display: flex;
+            gap: 16px;
+        }
+        .avatar-btn {
+            background: #f0f0f8;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6C5CE7;
+            cursor: pointer;
+        }
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .goal-card {
+            background: #f8f9ff;
+            border-radius: 24px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .goal-card.selected {
+            background: #6C5CE7;
+            color: white;
+        }
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(95deg, #6C5CE7, #8f7ef7);
+            border: none;
+            padding: 16px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #2D3436;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <!-- التحقق من التسجيل -->
-    <script>
-        (function() {
-            const userProfile = localStorage.getItem('userProfile');
-            if (!userProfile || !JSON.parse(userProfile).onboarded) {
-                window.location.href = "onboarding.html";
-                return;
+
+<div id="root"></div>
+
+<script>
+    // ========== بيانات التطبيق ==========
+    let appData = {
+        tasks: JSON.parse(localStorage.getItem('tasks')) || [],
+        habits: JSON.parse(localStorage.getItem('habits')) || [],
+        points: parseInt(localStorage.getItem('points')) || 0,
+        level: parseInt(localStorage.getItem('level')) || 1,
+        currentTab: 'home',
+        timerSeconds: 45 * 60,
+        timerRunning: false,
+        timerInterval: null,
+        currentDate: new Date(),
+        userProfile: JSON.parse(localStorage.getItem('userProfile')) || null,
+        onboarded: localStorage.getItem('onboarded') === 'true',
+        language: localStorage.getItem('appLanguage') || 'ar'
+    };
+
+    // ========== قواميس الترجمة ==========
+    const translations = {
+        ar: {
+            // عام
+            appName: 'استغل وقتك',
+            subName: 'Make Use of Your Time',
+            // شريط التنقل
+            navHome: 'الرئيسية',
+            navTasks: 'المهام',
+            navTimer: 'مؤقت',
+            navHabits: 'العادات',
+            navCalendar: 'الرزنامة',
+            // الصفحة الرئيسية
+            greeting: 'مرحباً',
+            tasksLabel: 'مهمة',
+            doneLabel: 'مكتملة',
+            pointsLabel: 'نقطة',
+            levelLabel: 'مستوى',
+            streakLabel: 'يوم متتالي',
+            todayTasks: 'مهام اليوم',
+            viewAll: 'عرض الكل',
+            todayHabits: 'عادات اليوم',
+            trackHabits: 'تتبع العادات',
+            noTasksToday: '✨ لا توجد مهام لليوم',
+            noHabitsToday: '✨ لم تقم بأي عادة اليوم',
+            // المهام
+            addTask: 'إضافة مهمة',
+            taskTitlePlaceholder: 'عنوان المهمة',
+            deleteTaskConfirm: 'هل تريد حذف هذه المهمة؟',
+            noTasks: '📝 لا توجد مهام',
+            // العادات
+            addHabit: 'إضافة عادة',
+            habitNamePlaceholder: 'اسم العادة',
+            deleteHabitConfirm: 'هل تريد حذف هذه العادة؟',
+            noHabits: '🔄 أضف عادتك الأولى',
+            days: 'يوم',
+            // المؤقت
+            startTimer: '▶ بدء',
+            pauseTimer: '⏸ إيقاف',
+            min25: '25 د',
+            min45: '45 د',
+            min60: '60 د',
+            timerComplete: '🎉 انتهى الوقت! +50 نقطة',
+            // الإشعارات
+            taskAdded: 'تمت إضافة المهمة',
+            taskCompleted: 'إكمال مهمة',
+            habitAdded: 'تمت إضافة العادة',
+            habitCompleted: 'إكمال عادة',
+            pointsEarned: 'نقطة',
+            levelUp: '🎉 رفعت المستوى إلى',
+            focusComplete: 'إكمال جلسة تركيز',
+            streakBonus: 'يوم متتالي',
+            // التسجيل
+            fullName: 'الاسم الكامل',
+            age: 'العمر',
+            goals: 'ما الذي تريد استغلال وقتك فيه؟',
+            startJourney: '✨ ابدأ رحلتي ✨',
+            selectGoal: 'الرجاء اختيار هدف واحد على الأقل',
+            enterName: 'الرجاء إدخال الاسم',
+            enterAge: 'الرجاء إدخال عمر صحيح',
+            welcome: 'مرحباً بك يا',
+            // خروج
+            logoutConfirm: 'هل تريد تسجيل الخروج؟'
+        },
+        en: {
+            appName: 'Make Use of Your Time',
+            subName: 'استغل وقتك',
+            navHome: 'Home',
+            navTasks: 'Tasks',
+            navTimer: 'Timer',
+            navHabits: 'Habits',
+            navCalendar: 'Calendar',
+            greeting: 'Welcome',
+            tasksLabel: 'Tasks',
+            doneLabel: 'Done',
+            pointsLabel: 'Points',
+            levelLabel: 'Level',
+            streakLabel: 'Day streak',
+            todayTasks: "Today's Tasks",
+            viewAll: 'View all',
+            todayHabits: "Today's Habits",
+            trackHabits: 'Track habits',
+            noTasksToday: '✨ No tasks for today',
+            noHabitsToday: '✨ No habits completed today',
+            addTask: 'Add Task',
+            taskTitlePlaceholder: 'Task title',
+            deleteTaskConfirm: 'Delete this task?',
+            noTasks: '📝 No tasks',
+            addHabit: 'Add Habit',
+            habitNamePlaceholder: 'Habit name',
+            deleteHabitConfirm: 'Delete this habit?',
+            noHabits: '🔄 Add your first habit',
+            days: 'days',
+            startTimer: '▶ Start',
+            pauseTimer: '⏸ Pause',
+            min25: '25 min',
+            min45: '45 min',
+            min60: '60 min',
+            timerComplete: '🎉 Time finished! +50 points',
+            taskAdded: 'Task added',
+            taskCompleted: 'Task completed',
+            habitAdded: 'Habit added',
+            habitCompleted: 'Habit completed',
+            pointsEarned: 'points',
+            levelUp: '🎉 Level up to',
+            focusComplete: 'Focus session completed',
+            streakBonus: 'day streak',
+            fullName: 'Full Name',
+            age: 'Age',
+            goals: 'What do you want to focus on?',
+            startJourney: '✨ Start My Journey ✨',
+            selectGoal: 'Please select at least one goal',
+            enterName: 'Please enter your name',
+            enterAge: 'Please enter a valid age',
+            welcome: 'Welcome',
+            logoutConfirm: 'Do you want to logout?'
+        }
+    };
+
+    function t(key) {
+        return translations[appData.language][key] || key;
+    }
+
+    // ========== دوال مساعدة ==========
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+
+    function saveData() {
+        localStorage.setItem('tasks', JSON.stringify(appData.tasks));
+        localStorage.setItem('habits', JSON.stringify(appData.habits));
+        localStorage.setItem('points', appData.points);
+        localStorage.setItem('level', appData.level);
+        localStorage.setItem('appLanguage', appData.language);
+    }
+
+    function addPoints(amount, reason) {
+        appData.points += amount;
+        const newLevel = Math.floor(appData.points / 500) + 1;
+        if (newLevel > appData.level) {
+            appData.level = newLevel;
+            showToast(`${t('levelUp')} ${appData.level}! 🎉`);
+        }
+        saveData();
+        updateMainUI();
+        showToast(`+${amount} ${t('pointsEarned')} ${reason ? '✨' : ''}`);
+    }
+
+    // ========== المهام ==========
+    function addTask(title) {
+        if (!title) return;
+        const task = {
+            id: Date.now(),
+            title: title,
+            date: new Date().toISOString().split('T')[0],
+            completed: false
+        };
+        appData.tasks.unshift(task);
+        saveData();
+        updateMainUI();
+        renderTasksList();
+        addPoints(10, t('taskAdded'));
+    }
+
+    function toggleTask(id) {
+        const task = appData.tasks.find(t => t.id === id);
+        if (task && !task.completed) {
+            task.completed = true;
+            addPoints(15, t('taskCompleted'));
+        } else if (task) {
+            task.completed = false;
+        }
+        saveData();
+        updateMainUI();
+        renderTasksList();
+    }
+
+    function deleteTask(id) {
+        if (confirm(t('deleteTaskConfirm'))) {
+            appData.tasks = appData.tasks.filter(t => t.id !== id);
+            saveData();
+            updateMainUI();
+            renderTasksList();
+        }
+    }
+
+    function renderTasksList() {
+        const container = document.getElementById('tasksList');
+        if (!container) return;
+        if (appData.tasks.length === 0) {
+            container.innerHTML = `<div style="text-align:center;padding:40px;color:#888;">${t('noTasks')}</div>`;
+            return;
+        }
+        container.innerHTML = appData.tasks.map(task => `
+            <div class="task-item">
+                <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                <div class="task-content" onclick="deleteTask(${task.id})">
+                    <div class="task-title" style="${task.completed ? 'text-decoration:line-through;opacity:0.6' : ''}">${escapeHtml(task.title)}</div>
+                    <div class="task-meta">${task.date}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ========== العادات ==========
+    function addHabit(name, color) {
+        if (!name) return;
+        const habit = {
+            id: Date.now(),
+            name: name,
+            color: color || '#6C5CE7',
+            dates: [],
+            streak: 0
+        };
+        appData.habits.push(habit);
+        saveData();
+        updateMainUI();
+        renderHabits();
+        addPoints(20, t('habitAdded'));
+    }
+
+    function toggleHabit(id) {
+        const habit = appData.habits.find(h => h.id === id);
+        const today = new Date().toISOString().split('T')[0];
+        if (habit.dates.includes(today)) {
+            habit.dates = habit.dates.filter(d => d !== today);
+            habit.streak = Math.max(0, habit.streak - 1);
+        } else {
+            habit.dates.push(today);
+            habit.streak++;
+            addPoints(25, t('habitCompleted'));
+            if (habit.streak % 7 === 0) {
+                addPoints(100, `${habit.streak} ${t('streakBonus')} ✨`);
             }
-        })();
-    </script>
+        }
+        saveData();
+        updateMainUI();
+        renderHabits();
+    }
 
-    <!-- شاشة التحميل -->
-    <div class="splash-screen" id="splashScreen">
-        <div class="splash-logo">
-            <div class="logo-icon">✦</div>
-            <h1>TaskFlow</h1>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-        </div>
-    </div>
+    function deleteHabit(id) {
+        if (confirm(t('deleteHabitConfirm'))) {
+            appData.habits = appData.habits.filter(h => h.id !== id);
+            saveData();
+            updateMainUI();
+            renderHabits();
+        }
+    }
 
-    <div class="app-container">
-        <!-- شريط التنقل السفلي -->
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-tab="home">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    function renderHabits() {
+        const container = document.getElementById('habitsList');
+        if (!container) return;
+        const today = new Date().toISOString().split('T')[0];
+        if (appData.habits.length === 0) {
+            container.innerHTML = `<div style="text-align:center;padding:40px;color:#888;">${t('noHabits')}</div>`;
+            return;
+        }
+        container.innerHTML = appData.habits.map(habit => {
+            const isDone = habit.dates.includes(today);
+            return `
+                <div class="habit-card" style="background: ${habit.color}">
+                    <div class="habit-info">
+                        <div class="habit-name">${escapeHtml(habit.name)}</div>
+                        <div class="habit-streak">🔥 ${habit.streak} ${t('days')}</div>
+                    </div>
+                    <button class="habit-check ${isDone ? 'done' : ''}" onclick="toggleHabit(${habit.id})">${isDone ? '✓' : ''}</button>
+                    <button class="habit-delete" onclick="deleteHabit(${habit.id})">✕</button>
                 </div>
-                <span>الرئيسية</span>
-            </button>
-            <button class="nav-item" data-tab="tasks">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.5 12H9v-4.5H7.5V9h3v6zm5.5 0h-4v-1.5h4V15zm0-3h-4v-1.5h4V12z"/></svg>
-                </div>
-                <span>المهام</span>
-            </button>
-            <button class="nav-item nav-center" data-tab="timer">
-                <div class="nav-icon-center">
-                    <svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-                </div>
-                <span>مؤقت</span>
-            </button>
-            <button class="nav-item" data-tab="habits">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                </div>
-                <span>العادات</span>
-            </button>
-            <button class="nav-item" data-tab="calendar">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
-                </div>
-                <span>الرزنامة</span>
-            </button>
-        </nav>
+            `;
+        }).join('');
+    }
 
-        <!-- المحتوى الرئيسي -->
-        <main class="main-content">
-            <!-- الصفحة الرئيسية -->
-            <section class="page active" id="home-page">
-                <header class="page-header">
-                    <div class="greeting">
-                        <h2 id="greetingTitle">مرحباً! 👋</h2>
-                        <p class="date-display" id="dateDisplay"></p>
-                    </div>
-                    <div class="avatar" id="avatarBtn" style="cursor: pointer;">
-                        <img id="userAvatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%236C5CE7' d='M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .66.54 1.2 1.2 1.2h16.8c.66 0 1.2-.54 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z'/%3E%3C/svg%3E" alt="Avatar">
-                    </div>
-                </header>
+    // ========== المؤقت ==========
+    function setTimer(minutes) {
+        appData.timerSeconds = minutes * 60;
+        updateTimerDisplay();
+        if (appData.timerRunning) {
+            clearInterval(appData.timerInterval);
+            appData.timerRunning = false;
+            const btn = document.getElementById('timerBtn');
+            if (btn) btn.innerHTML = t('startTimer');
+        }
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
 
-                <div class="quick-stats">
-                    <div class="stat-card glass">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #FF6B6B, #FF8E8E)">
-                            <span>📋</span>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="totalTasks">0</span>
-                            <span class="stat-label">مهمة</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #4ECDC4, #44B5AD)">
-                            <span>✅</span>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="doneTasks">0</span>
-                            <span class="stat-label">مكتملة</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #FFD93D, #FFB830)">
-                            <span>🔥</span>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="streakDays">0</span>
-                            <span class="stat-label">يوم</span>
-                        </div>
-                    </div>
+    function toggleTimer() {
+        if (appData.timerRunning) {
+            clearInterval(appData.timerInterval);
+            appData.timerRunning = false;
+            document.getElementById('timerBtn').innerHTML = t('startTimer');
+        } else {
+            appData.timerRunning = true;
+            document.getElementById('timerBtn').innerHTML = t('pauseTimer');
+            appData.timerInterval = setInterval(() => {
+                if (appData.timerSeconds > 0) {
+                    appData.timerSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(appData.timerInterval);
+                    appData.timerRunning = false;
+                    document.getElementById('timerBtn').innerHTML = t('startTimer');
+                    addPoints(50, t('focusComplete'));
+                    showToast(t('timerComplete'));
+                }
+            }, 1000);
+        }
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(appData.timerSeconds / 60);
+        const seconds = appData.timerSeconds % 60;
+        const display = document.getElementById('timerDisplay');
+        if (display) display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const circumference = 2 * Math.PI * 90;
+        const progress = ((appData.timerSeconds / (45 * 60)) * circumference);
+        const progressCircle = document.getElementById('timerProgress');
+        if (progressCircle) progressCircle.style.strokeDashoffset = progress;
+    }
+
+    // ========== التقويم ==========
+    function renderCalendar() {
+        const year = appData.currentDate.getFullYear();
+        const month = appData.currentDate.getMonth();
+        const monthNames = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        document.getElementById('monthDisplay').textContent = `${monthNames[month]} ${year}`;
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        let html = '';
+        for (let i = 0; i < firstDay; i++) html += '<div></div>';
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+            html += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
+        }
+        document.getElementById('calendarDays').innerHTML = html;
+    }
+
+    function navigateMonth(delta) {
+        appData.currentDate.setMonth(appData.currentDate.getMonth() + delta);
+        renderCalendar();
+    }
+
+    // ========== تحديث الواجهة الرئيسية ==========
+    function updateMainUI() {
+        // إحصائيات
+        document.getElementById('totalTasks').textContent = appData.tasks.length;
+        document.getElementById('doneTasks').textContent = appData.tasks.filter(t => t.completed).length;
+        document.getElementById('pointsDisplay').textContent = appData.points;
+        document.getElementById('levelDisplay').textContent = appData.level;
+        
+        // حساب السلسلة
+        let streak = 0;
+        const today = new Date().toISOString().split('T')[0];
+        for (let i = 0; i < 365; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            const hasTask = appData.tasks.some(t => t.completed && t.date === dateStr);
+            const hasHabit = appData.habits.some(h => h.dates && h.dates.includes(dateStr));
+            if (hasTask || hasHabit) streak++;
+            else break;
+        }
+        document.getElementById('streakDays').textContent = streak;
+        
+        // مهام اليوم
+        const todayTasks = appData.tasks.filter(t => t.date === today && !t.completed);
+        const preview = document.getElementById('todayTasksPreview');
+        if (preview) {
+            if (todayTasks.length === 0) preview.innerHTML = `<p style="text-align:center;padding:20px;color:#888;">${t('noTasksToday')}</p>`;
+            else preview.innerHTML = todayTasks.slice(0, 3).map(task => `
+                <div class="task-item">
+                    <div class="task-checkbox" onclick="toggleTask(${task.id})"></div>
+                    <div class="task-content">${escapeHtml(task.title)}</div>
                 </div>
-
-                <div class="section-card glass">
-                    <div class="section-header">
-                        <h3>مهام اليوم</h3>
-                        <button class="btn-text" onclick="switchTab('tasks')">عرض الكل</button>
-                    </div>
-                    <div class="today-tasks" id="todayTasksPreview"></div>
+            `).join('');
+        }
+        
+        // العادات
+        const habitsPreview = document.getElementById('habitsPreview');
+        if (habitsPreview) {
+            const todayHabits = appData.habits.filter(h => h.dates && h.dates.includes(today));
+            if (todayHabits.length === 0) habitsPreview.innerHTML = `<p style="text-align:center;padding:20px;color:#888;">${t('noHabitsToday')}</p>`;
+            else habitsPreview.innerHTML = todayHabits.slice(0, 3).map(habit => `
+                <div class="habit-card" style="background: ${habit.color}; padding:12px; border-radius:12px; margin-bottom:8px;">
+                    <span>${escapeHtml(habit.name)}</span>
+                    <span style="margin-right:auto;">✓</span>
                 </div>
+            `).join('');
+        }
+        
+        // الترحيب
+        const greetingEl = document.getElementById('greetingTitle');
+        if (greetingEl && appData.userProfile) {
+            greetingEl.innerHTML = `${t('greeting')} ${escapeHtml(appData.userProfile.name)}! 👋`;
+        }
+        
+        // التاريخ
+        document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString(appData.language === 'ar' ? 'ar-SA' : 'en-US');
+        
+        // الصورة الشخصية
+        const avatarImg = document.getElementById('userAvatar');
+        if (avatarImg && appData.userProfile?.profileImage) {
+            avatarImg.src = appData.userProfile.profileImage;
+        }
+    }
 
-                <div class="section-card glass">
-                    <div class="section-header">
-                        <h3>عادات اليوم</h3>
-                        <button class="btn-text" onclick="switchTab('habits')">تتبع العادات</button>
-                    </div>
-                    <div class="habits-preview" id="habitsPreview"></div>
-                </div>
-            </section>
+    // ========== التنقل ==========
+    function switchTab(tab) {
+        appData.currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const activeNav = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+        if (activeNav) activeNav.classList.add('active');
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById(`${tab}-page`).classList.add('active');
+        if (tab === 'tasks') renderTasksList();
+        if (tab === 'habits') renderHabits();
+        if (tab === 'calendar') renderCalendar();
+    }
 
-            <!-- صفحة المهام -->
-            <section class="page" id="tasks-page">
-                <header class="page-header">
-                    <h2>المهام</h2>
-                    <button class="btn-icon" onclick="openTaskModal()">
-                        <span>+</span>
+    function openTaskModal() {
+        const title = prompt(t('addTask'));
+        if (title) addTask(title);
+    }
+
+    function openHabitModal() {
+        const name = prompt(t('addHabit'));
+        if (name) addHabit(name);
+    }
+
+    function logout() {
+        if (confirm(t('logoutConfirm'))) {
+            localStorage.clear();
+            window.location.reload();
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // ========== بناء التطبيق الرئيسي ==========
+    function buildMainApp() {
+        document.getElementById('root').innerHTML = `
+            <div class="app-container">
+                <nav class="bottom-nav">
+                    <button class="nav-item ${appData.currentTab === 'home' ? 'active' : ''}" data-tab="home" onclick="switchTab('home')">
+                        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></div>
+                        <span>${t('navHome')}</span>
                     </button>
-                </header>
-
-                <div class="filter-chips">
-                    <button class="chip active" data-filter="all">الكل</button>
-                    <button class="chip" data-filter="pending">قيد الانتظار</button>
-                    <button class="chip" data-filter="completed">مكتملة</button>
-                </div>
-
-                <div class="tasks-container" id="tasksContainer"></div>
-            </section>
-
-            <!-- صفحة المؤقت -->
-            <section class="page" id="timer-page">
-                <div class="timer-hero">
-                    <div class="timer-circle" id="timerCircle">
-                        <svg viewBox="0 0 200 200">
-                            <circle cx="100" cy="100" r="90" class="timer-bg"/>
-                            <circle cx="100" cy="100" r="90" class="timer-progress" id="timerProgress"/>
-                        </svg>
-                        <div class="timer-display" id="timerDisplay">25:00</div>
-                    </div>
-                    
-                    <div class="timer-presets">
-                        <button class="preset-btn" onclick="setPresetTimer(25)">25 د</button>
-                        <button class="preset-btn active" onclick="setPresetTimer(45)">45 د</button>
-                        <button class="preset-btn" onclick="setPresetTimer(60)">60 د</button>
-                    </div>
-
-                    <div class="custom-time">
-                        <input type="number" id="customMinutes" placeholder="دقائق مخصصة" min="1" max="120">
-                    </div>
-
-                    <button class="btn-primary btn-large" id="timerStartBtn" onclick="toggleTimer()">
-                        <span>▶ بدء المؤقت</span>
+                    <button class="nav-item ${appData.currentTab === 'tasks' ? 'active' : ''}" data-tab="tasks" onclick="switchTab('tasks')">
+                        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.5 12H9v-4.5H7.5V9h3v6zm5.5 0h-4v-1.5h4V15zm0-3h-4v-1.5h4V12z"/></svg></div>
+                        <span>${t('navTasks')}</span>
                     </button>
-                </div>
-            </section>
-
-            <!-- صفحة العادات -->
-            <section class="page" id="habits-page">
-                <header class="page-header">
-                    <h2>العادات</h2>
-                    <button class="btn-icon" onclick="openHabitModal()">
-                        <span>+</span>
+                    <button class="nav-item nav-center ${appData.currentTab === 'timer' ? 'active' : ''}" data-tab="timer" onclick="switchTab('timer')">
+                        <div class="nav-icon-center"><svg viewBox="0 0 24 24"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg></div>
+                        <span>${t('navTimer')}</span>
                     </button>
-                </header>
+                    <button class="nav-item ${appData.currentTab === 'habits' ? 'active' : ''}" data-tab="habits" onclick="switchTab('habits')">
+                        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                        <span>${t('navHabits')}</span>
+                    </button>
+                    <button class="nav-item ${appData.currentTab === 'calendar' ? 'active' : ''}" data-tab="calendar" onclick="switchTab('calendar')">
+                        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg></div>
+                        <span>${t('navCalendar')}</span>
+                    </button>
+                </nav>
 
-                <div class="habits-grid" id="habitsGrid"></div>
-            </section>
+                <div class="page active" id="home-page">
+                    <header class="page-header">
+                        <div class="greeting">
+                            <h2 id="greetingTitle">${t('greeting')}! 👋</h2>
+                            <p class="date-display" id="dateDisplay"></p>
+                        </div>
+                        <div class="avatar" onclick="logout()">
+                            <img id="userAvatar" src="${appData.userProfile?.profileImage || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'%3E%3Cpath fill=\'%236C5CE7\' d=\'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .66.54 1.2 1.2 1.2h16.8c.66 0 1.2-.54 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z\'/%3E%3C/svg%3E'}">
+                        </div>
+                    </header>
 
-            <!-- صفحة الرزنامة -->
-            <section class="page" id="calendar-page">
-                <div class="calendar-hero">
-                    <div class="calendar-nav">
-                        <button class="btn-icon" onclick="navigateMonth(-1)">‹</button>
-                        <h3 id="monthDisplay"></h3>
-                        <button class="btn-icon" onclick="navigateMonth(1)">›</button>
+                    <div class="quick-stats">
+                        <div class="stat-card glass"><div class="stat-value" id="totalTasks">0</div><div class="stat-label">${t('tasksLabel')}</div></div>
+                        <div class="stat-card glass"><div class="stat-value" id="doneTasks">0</div><div class="stat-label">${t('doneLabel')}</div></div>
+                        <div class="stat-card glass"><div class="stat-value" id="pointsDisplay">0</div><div class="stat-label">${t('pointsLabel')}</div></div>
+                        <div class="stat-card glass"><div class="stat-value" id="levelDisplay">1</div><div class="stat-label">${t('levelLabel')}</div></div>
+                        <div class="stat-card glass"><div class="stat-value" id="streakDays">0</div><div class="stat-label">${t('streakLabel')}</div></div>
                     </div>
-                    <div class="calendar-weekdays">
-                        <span>أحد</span><span>إثنين</span><span>ثلاثاء</span>
-                        <span>أربعاء</span><span>خميس</span><span>جمعة</span><span>سبت</span>
+
+                    <div class="section-card glass">
+                        <div class="section-header"><h3>${t('todayTasks')}</h3><button class="btn-text" onclick="switchTab('tasks')">${t('viewAll')}</button></div>
+                        <div id="todayTasksPreview"></div>
                     </div>
-                    <div class="calendar-days" id="calendarDays"></div>
-                </div>
-            </section>
-        </main>
 
-        <!-- نافذة إضافة مهمة -->
-        <div class="modal" id="taskModal">
-            <div class="modal-content glass">
-                <div class="modal-header">
-                    <h3>مهمة جديدة</h3>
-                    <button class="btn-icon" onclick="closeTaskModal()">✕</button>
+                    <div class="section-card glass">
+                        <div class="section-header"><h3>${t('todayHabits')}</h3><button class="btn-text" onclick="switchTab('habits')">${t('trackHabits')}</button></div>
+                        <div id="habitsPreview"></div>
+                    </div>
                 </div>
-                <input type="text" id="taskTitleInput" placeholder="عنوان المهمة" class="input-field">
-                <textarea id="taskDescInput" placeholder="وصف المهمة (اختياري)" class="input-field"></textarea>
-                <div class="input-row">
-                    <input type="date" id="taskDateInput" class="input-field">
-                    <select id="taskPriorityInput" class="input-field">
-                        <option value="low">⚪ منخفضة</option>
-                        <option value="medium" selected>🟡 متوسطة</option>
-                        <option value="high">🔴 عالية</option>
-                    </select>
+
+                <div class="page" id="tasks-page">
+                    <header class="page-header"><h2>${t('navTasks')}</h2><button class="btn-icon" onclick="openTaskModal()">+</button></header>
+                    <div id="tasksList" class="tasks-container"></div>
                 </div>
-                <button class="btn-primary btn-full" onclick="addTaskFromModal()">إضافة المهمة</button>
+
+                <div class="page" id="timer-page">
+                    <div class="timer-hero">
+                        <div class="timer-circle">
+                            <svg width="240" height="240" viewBox="0 0 240 240">
+                                <circle cx="120" cy="120" r="110" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+                                <circle cx="120" cy="120" r="110" fill="none" stroke="white" stroke-width="8" stroke-dasharray="691.15" stroke-dashoffset="0" stroke-linecap="round" id="timerProgress" style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1s linear;"/>
+                            </svg>
+                            <div class="timer-display" id="timerDisplay">45:00</div>
+                        </div>
+                        <div class="timer-presets">
+                            <button class="preset-btn" onclick="setTimer(25)">${t('min25')}</button>
+                            <button class="preset-btn active" onclick="setTimer(45)">${t('min45')}</button>
+                            <button class="preset-btn" onclick="setTimer(60)">${t('min60')}</button>
+                        </div>
+                        <button class="btn-primary" id="timerBtn" onclick="toggleTimer()">${t('startTimer')}</button>
+                    </div>
+                </div>
+
+                <div class="page" id="habits-page">
+                    <header class="page-header"><h2>${t('navHabits')}</h2><button class="btn-icon" onclick="openHabitModal()">+</button></header>
+                    <div id="habitsList" class="habits-container"></div>
+                </div>
+
+                <div class="page" id="calendar-page">
+                    <div class="calendar-hero">
+                        <div class="calendar-nav">
+                            <button class="btn-icon" onclick="navigateMonth(-1)">‹</button>
+                            <h3 id="monthDisplay"></h3>
+                            <button class="btn-icon" onclick="navigateMonth(1)">›</button>
+                        </div>
+                        <div class="calendar-weekdays">أحد إثنين ثلاثاء أربعاء خميس جمعة سبت</div>
+                        <div class="calendar-days" id="calendarDays"></div>
+                    </div>
+                </div>
             </div>
-        </div>
+        `;
+        updateMainUI();
+        renderCalendar();
+        updateTimerDisplay();
+    }
 
-        <!-- نافذة إضافة عادة -->
-        <div class="modal" id="habitModal">
-            <div class="modal-content glass">
-                <div class="modal-header">
-                    <h3>عادة جديدة</h3>
-                    <button class="btn-icon" onclick="closeHabitModal()">✕</button>
+    // ========== بناء صفحة التسجيل ==========
+    let selectedGoals = [];
+    let profileImageData = null;
+
+    function renderOnboardingGoals() {
+        const goalsList = appData.language === 'ar' 
+            ? [{emoji:"📚",text:"دراسة"},{emoji:"🏃",text:"رياضة"},{emoji:"⏰",text:"تنظيم الوقت"},{emoji:"🧘",text:"تطوير ذات"},{emoji:"💼",text:"عمل"},{emoji:"🎨",text:"إبداع"}]
+            : [{emoji:"📚",text:"Study"},{emoji:"🏃",text:"Sports"},{emoji:"⏰",text:"Time Management"},{emoji:"🧘",text:"Self Growth"},{emoji:"💼",text:"Work"},{emoji:"🎨",text:"Creativity"}];
+        
+        const container = document.getElementById('onboardingGoalsGrid');
+        if (!container) return;
+        container.innerHTML = '';
+        goalsList.forEach(goal => {
+            const div = document.createElement('div');
+            div.className = 'goal-card';
+            if (selectedGoals.includes(goal.text)) div.classList.add('selected');
+            div.innerHTML = `<span>${goal.emoji}</span> <span>${goal.text}</span>`;
+            div.onclick = () => {
+                if (selectedGoals.includes(goal.text)) {
+                    selectedGoals = selectedGoals.filter(g => g !== goal.text);
+                    div.classList.remove('selected');
+                } else {
+                    selectedGoals.push(goal.text);
+                    div.classList.add('selected');
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function setLanguage(lang) {
+        appData.language = lang;
+        localStorage.setItem('appLanguage', lang);
+        buildOnboarding();
+    }
+
+    function handleOnboardingFileUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                profileImageData = e.target.result;
+                const img = document.getElementById('onboardingAvatarImg');
+                const placeholder = document.getElementById('onboardingAvatarPlaceholder');
+                if (img && placeholder) {
+                    img.src = profileImageData;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function handleOnboardingUrlImage() {
+        const url = prompt(appData.language === 'ar' ? 'أدخل رابط الصورة:' : 'Enter image URL:');
+        if (url && (url.startsWith('http') || url.startsWith('data'))) {
+            profileImageData = url;
+            const img = document.getElementById('onboardingAvatarImg');
+            const placeholder = document.getElementById('onboardingAvatarPlaceholder');
+            if (img && placeholder) {
+                img.src = url;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+        }
+    }
+
+    function completeRegistration() {
+        const name = document.getElementById('onboardingName')?.value.trim();
+        const age = document.getElementById('onboardingAge')?.value;
+        
+        if (!name) {
+            alert(t('enterName'));
+            return;
+        }
+        if (!age || age < 1 || age > 120) {
+            alert(t('enterAge'));
+            return;
+        }
+        if (selectedGoals.length === 0) {
+            alert(t('selectGoal'));
+            return;
+        }
+        
+        appData.userProfile = {
+            name: name,
+            age: parseInt(age),
+            goals: selectedGoals,
+            profileImage: profileImageData,
+            language: appData.language
+        };
+        appData.onboarded = true;
+        
+        localStorage.setItem('userProfile', JSON.stringify(appData.userProfile));
+        localStorage.setItem('onboarded', 'true');
+        if (profileImageData) localStorage.setItem('userProfileImage', profileImageData);
+        
+        showToast(`${t('welcome')} ${name}! 🎉`);
+        
+        setTimeout(() => {
+            buildMainApp();
+        }, 500);
+    }
+
+    function buildOnboarding() {
+        document.getElementById('root').innerHTML = `
+            <div class="onboarding-wrapper">
+                <div class="onboarding-card">
+                    <div class="lang-bar">
+                        <button class="lang-btn ${appData.language === 'ar' ? 'active' : ''}" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+                        <button class="lang-btn ${appData.language === 'en' ? 'active' : ''}" onclick="setLanguage('en')">🇬🇧 English</button>
+                    </div>
+                    <div class="form-content">
+                        <div class="logo-area">
+                            <h1>${t('appName')}</h1>
+                            <p>${t('subName')}</p>
+                        </div>
+
+                        <div class="avatar-section">
+                            <div class="avatar-preview" id="onboardingAvatarPreview" onclick="document.getElementById('onboardingFileInput').click()">
+                                <div class="avatar-placeholder" id="onboardingAvatarPlaceholder">📸</div>
+                                <img id="onboardingAvatarImg" style="display:none; width:100%; height:100%;">
+                            </div>
+                            <input type="file" id="onboardingFileInput" accept="image/*" style="display:none" onchange="handleOnboardingFileUpload(this)">
+                            <div class="avatar-actions">
+                                <button class="avatar-btn" onclick="document.getElementById('onboardingFileInput').click()">📁 ${appData.language === 'ar' ? 'رفع صورة' : 'Upload'}</button>
+                                <button class="avatar-btn" onclick="handleOnboardingUrlImage()">🔗 ${appData.language === 'ar' ? 'رابط الصورة' : 'Image URL'}</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>${t('fullName')}</label>
+                            <input type="text" id="onboardingName" class="input-field" placeholder="${appData.language === 'ar' ? 'أدخل اسمك' : 'Enter your name'}">
+                        </div>
+
+                        <div class="input-group">
+                            <label>${t('age')}</label>
+                            <input type="number" id="onboardingAge" class="input-field" placeholder="${appData.language === 'ar' ? 'مثال: 25' : 'e.g., 25'}">
+                        </div>
+
+                        <div class="input-group">
+                            <label>${t('goals')}</label>
+                            <div class="goals-grid" id="onboardingGoalsGrid"></div>
+                        </div>
+
+                        <button class="submit-btn" onclick="completeRegistration()">${t('startJourney')}</button>
+                    </div>
                 </div>
-                <input type="text" id="habitNameInput" placeholder="اسم العادة" class="input-field">
-                <select id="habitFreqInput" class="input-field">
-                    <option value="daily">🔄 يومياً</option>
-                    <option value="weekly">📅 أسبوعياً</option>
-                </select>
-                <div class="color-picker" id="habitColorPicker">
-                    <button class="color-option active" data-color="#FF6B6B" style="background: #FF6B6B"></button>
-                    <button class="color-option" data-color="#4ECDC4" style="background: #4ECDC4"></button>
-                    <button class="color-option" data-color="#45B7D1" style="background: #45B7D1"></button>
-                    <button class="color-option" data-color="#96CEB4" style="background: #96CEB4"></button>
-                    <button class="color-option" data-color="#FFEAA7" style="background: #FFEAA7"></button>
-                    <button class="color-option" data-color="#DDA0DD" style="background: #DDA0DD"></button>
-                </div>
-                <button class="btn-primary btn-full" onclick="addHabitFromModal()">إضافة العادة</button>
             </div>
-        </div>
-    </div>
+        `;
+        renderOnboardingGoals();
+    }
 
-    <script src="script.js"></script>
+    // ========== بدء التشغيل ==========
+    window.onload = () => {
+        const splash = document.createElement('div');
+        splash.className = 'splash-screen';
+        splash.innerHTML = `
+            <div class="splash-logo">
+                <div class="logo-icon">✦</div>
+                <h1>TaskFlow</h1>
+                <div class="loading-bar"><div class="loading-progress"></div></div>
+            </div>
+        `;
+        document.body.appendChild(splash);
+        
+        setTimeout(() => {
+            splash.classList.add('hidden');
+            setTimeout(() => splash.remove(), 500);
+            if (appData.onboarded && appData.userProfile) {
+                buildMainApp();
+            } else {
+                buildOnboarding();
+            }
+        }, 1500);
+    };
+</script>
 </body>
 </html>
