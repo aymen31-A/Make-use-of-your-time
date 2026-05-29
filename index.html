@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#6C5CE7">
     <title>استغل وقتك - TaskFlow</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="logo.png">
     <style>
         * {
             margin: 0;
@@ -43,60 +42,7 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* ========== شاشة التحميل ========== */
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s, visibility 0.5s;
-        }
-        .splash-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .splash-logo {
-            text-align: center;
-            color: white;
-        }
-        .logo-icon {
-            font-size: 60px;
-            animation: pulse 2s infinite;
-        }
-        .splash-logo h1 {
-            font-size: 36px;
-            margin: 20px 0;
-        }
-        .loading-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            overflow: hidden;
-            margin: 20px auto;
-        }
-        .loading-progress {
-            width: 0%;
-            height: 100%;
-            background: white;
-            animation: loading 2s ease-in-out forwards;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        @keyframes loading {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
-
-        /* ========== التطبيق الرئيسي ========== */
+        /* التطبيق الرئيسي */
         .app-container {
             max-width: 500px;
             margin: 0 auto;
@@ -107,7 +53,7 @@
             padding-bottom: 85px;
         }
 
-        /* ========== شريط المعلومات العلوي (ساعة + تاريخ) ========== */
+        /* شريط المعلومات العلوي (ساعة + تاريخ) */
         .info-bar {
             background: var(--glass);
             backdrop-filter: blur(20px);
@@ -477,7 +423,7 @@
             justify-content: center;
         }
 
-        /* التقويم - تم إصلاحه بالكامل */
+        /* التقويم */
         .calendar-hero {
             background: var(--glass);
             border-radius: var(--radius);
@@ -1146,7 +1092,7 @@
         if (progressCircle) progressCircle.style.strokeDashoffset = progress;
     }
 
-    // ========== التقويم المصحح ==========
+    // ========== التقويم ==========
     function renderCalendar() {
         const year = appData.currentDate.getFullYear();
         const month = appData.currentDate.getMonth();
@@ -1155,22 +1101,18 @@
                            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
         document.getElementById('monthDisplay').textContent = `${monthNames[month]} ${year}`;
         
-        // اليوم الأول من الشهر (0 = الأحد, 1 = الاثنين, ...)
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
         
-        // أيام الشهر السابق
         const prevMonthDays = new Date(year, month, 0).getDate();
         
         let daysHTML = '';
         
-        // إضافة أيام الشهر السابق
         for (let i = firstDay - 1; i >= 0; i--) {
             daysHTML += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
         }
         
-        // إضافة أيام الشهر الحالي
         for (let day = 1; day <= daysInMonth; day++) {
             const isToday = today.getDate() === day && 
                            today.getMonth() === month && 
@@ -1178,7 +1120,6 @@
             daysHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
         }
         
-        // إضافة أيام الشهر التالي لإكمال الشبكة (6 صفوف كحد أقصى)
         const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
         const remainingCells = totalCells - (firstDay + daysInMonth);
         for (let i = 1; i <= remainingCells; i++) {
@@ -1571,28 +1512,13 @@
         renderOnboardingGoals();
     }
 
-    // ========== بدء التشغيل ==========
+    // ========== بدء التشغيل (بدون شاشة تحميل) ==========
     window.onload = () => {
-        const splash = document.createElement('div');
-        splash.className = 'splash-screen';
-        splash.innerHTML = `
-            <div class="splash-logo">
-                <div class="logo-icon">✦</div>
-                <h1>TaskFlow</h1>
-                <div class="loading-bar"><div class="loading-progress"></div></div>
-            </div>
-        `;
-        document.body.appendChild(splash);
-        
-        setTimeout(() => {
-            splash.classList.add('hidden');
-            setTimeout(() => splash.remove(), 500);
-            if (appData.onboarded && appData.userProfile) {
-                buildMainApp();
-            } else {
-                buildOnboarding();
-            }
-        }, 1500);
+        if (appData.onboarded && appData.userProfile) {
+            buildMainApp();
+        } else {
+            buildOnboarding();
+        }
     };
 </script>
 </body>
