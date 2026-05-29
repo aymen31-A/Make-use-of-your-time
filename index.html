@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#6C5CE7">
     <title>استغل وقتك - TaskFlow</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="logo.png">
     <style>
         * {
             margin: 0;
@@ -34,6 +35,12 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: var(--dark);
+        }
+
+        /* الأرقام الأجنبية */
+        .clock, .stat-value, .timer-display, .task-meta, .habit-streak, .calendar-day {
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
         }
 
         /* ========== شاشة التحميل ========== */
@@ -98,6 +105,37 @@
             backdrop-filter: blur(20px);
             padding: 20px;
             padding-bottom: 85px;
+        }
+
+        /* ========== شريط المعلومات العلوي (ساعة + تاريخ) ========== */
+        .info-bar {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: var(--shadow);
+        }
+        .time-box {
+            text-align: center;
+            flex: 1;
+        }
+        .time-box .clock {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+        .time-box .date-arabic {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
         }
 
         /* شريط التنقل */
@@ -200,10 +238,6 @@
         .greeting h2 {
             font-size: 28px;
             margin-bottom: 4px;
-        }
-        .date-display {
-            font-size: 13px;
-            opacity: 0.85;
         }
         .avatar {
             width: 50px;
@@ -382,20 +416,6 @@
             height: 240px;
             margin-bottom: 30px;
         }
-        .timer-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.2);
-            stroke-width: 8;
-        }
-        .timer-progress {
-            fill: none;
-            stroke: white;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            transition: stroke-dashoffset 1s linear;
-        }
         .timer-display {
             position: absolute;
             top: 50%;
@@ -457,7 +477,7 @@
             justify-content: center;
         }
 
-        /* التقويم */
+        /* التقويم - تم إصلاحه بالكامل */
         .calendar-hero {
             background: var(--glass);
             border-radius: var(--radius);
@@ -469,6 +489,16 @@
             align-items: center;
             margin-bottom: 20px;
         }
+        .calendar-nav button {
+            background: rgba(108, 92, 231, 0.2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--primary);
+        }
         .calendar-nav h3 {
             font-size: 18px;
             font-weight: 800;
@@ -479,13 +509,16 @@
             text-align: center;
             margin-bottom: 10px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 13px;
             color: #666;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
         .calendar-days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
+            gap: 8px;
+            text-align: center;
         }
         .calendar-day {
             aspect-ratio: 1;
@@ -494,13 +527,20 @@
             justify-content: center;
             border-radius: 50%;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            background: rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            font-size: 14px;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .calendar-day:hover {
+            background: rgba(108, 92, 231, 0.1);
         }
         .calendar-day.today {
             background: var(--primary);
             color: white;
+        }
+        .calendar-day.other-month {
+            opacity: 0.3;
         }
 
         /* نافذة الإضافة */
@@ -720,6 +760,36 @@
             color: #2D3436;
             font-size: 14px;
         }
+
+        /* اسم المطور */
+        .developer-credit {
+            text-align: center;
+            margin-top: 20px;
+            padding: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .developer-credit span {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 480px) {
+            .info-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .time-box .clock {
+                font-size: 28px;
+            }
+            .calendar-weekdays {
+                font-size: 11px;
+            }
+            .calendar-day {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -746,16 +816,13 @@
     // ========== قواميس الترجمة ==========
     const translations = {
         ar: {
-            // عام
             appName: 'استغل وقتك',
             subName: 'Make Use of Your Time',
-            // شريط التنقل
             navHome: 'الرئيسية',
             navTasks: 'المهام',
             navTimer: 'مؤقت',
             navHabits: 'العادات',
             navCalendar: 'الرزنامة',
-            // الصفحة الرئيسية
             greeting: 'مرحباً',
             tasksLabel: 'مهمة',
             doneLabel: 'مكتملة',
@@ -768,25 +835,19 @@
             trackHabits: 'تتبع العادات',
             noTasksToday: '✨ لا توجد مهام لليوم',
             noHabitsToday: '✨ لم تقم بأي عادة اليوم',
-            // المهام
             addTask: 'إضافة مهمة',
-            taskTitlePlaceholder: 'عنوان المهمة',
             deleteTaskConfirm: 'هل تريد حذف هذه المهمة؟',
             noTasks: '📝 لا توجد مهام',
-            // العادات
             addHabit: 'إضافة عادة',
-            habitNamePlaceholder: 'اسم العادة',
             deleteHabitConfirm: 'هل تريد حذف هذه العادة؟',
             noHabits: '🔄 أضف عادتك الأولى',
             days: 'يوم',
-            // المؤقت
             startTimer: '▶ بدء',
             pauseTimer: '⏸ إيقاف',
             min25: '25 د',
             min45: '45 د',
             min60: '60 د',
             timerComplete: '🎉 انتهى الوقت! +50 نقطة',
-            // الإشعارات
             taskAdded: 'تمت إضافة المهمة',
             taskCompleted: 'إكمال مهمة',
             habitAdded: 'تمت إضافة العادة',
@@ -795,7 +856,6 @@
             levelUp: '🎉 رفعت المستوى إلى',
             focusComplete: 'إكمال جلسة تركيز',
             streakBonus: 'يوم متتالي',
-            // التسجيل
             fullName: 'الاسم الكامل',
             age: 'العمر',
             goals: 'ما الذي تريد استغلال وقتك فيه؟',
@@ -804,8 +864,9 @@
             enterName: 'الرجاء إدخال الاسم',
             enterAge: 'الرجاء إدخال عمر صحيح',
             welcome: 'مرحباً بك يا',
-            // خروج
-            logoutConfirm: 'هل تريد تسجيل الخروج؟'
+            logoutConfirm: 'هل تريد تسجيل الخروج؟',
+            developer: 'تطوير',
+            weekDays: ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت']
         },
         en: {
             appName: 'Make Use of Your Time',
@@ -828,11 +889,9 @@
             noTasksToday: '✨ No tasks for today',
             noHabitsToday: '✨ No habits completed today',
             addTask: 'Add Task',
-            taskTitlePlaceholder: 'Task title',
             deleteTaskConfirm: 'Delete this task?',
             noTasks: '📝 No tasks',
             addHabit: 'Add Habit',
-            habitNamePlaceholder: 'Habit name',
             deleteHabitConfirm: 'Delete this habit?',
             noHabits: '🔄 Add your first habit',
             days: 'days',
@@ -858,7 +917,9 @@
             enterName: 'Please enter your name',
             enterAge: 'Please enter a valid age',
             welcome: 'Welcome',
-            logoutConfirm: 'Do you want to logout?'
+            logoutConfirm: 'Do you want to logout?',
+            developer: 'Developed by',
+            weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
         }
     };
 
@@ -893,6 +954,22 @@
         saveData();
         updateMainUI();
         showToast(`+${amount} ${t('pointsEarned')} ${reason ? '✨' : ''}`);
+    }
+
+    // ========== دوال الساعة والتاريخ ==========
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        const timeString = `${hours}:${minutes}:${seconds}`;
+        
+        const clockElement = document.getElementById('clock');
+        if (clockElement) clockElement.textContent = timeString;
+        
+        const dateArabic = now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const dateElement = document.getElementById('dateArabic');
+        if (dateElement) dateElement.textContent = dateArabic;
     }
 
     // ========== المهام ==========
@@ -1030,7 +1107,7 @@
             if (btn) btn.innerHTML = t('startTimer');
         }
         document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        if (event && event.target) event.target.classList.add('active');
     }
 
     function toggleTimer() {
@@ -1061,28 +1138,54 @@
         const seconds = appData.timerSeconds % 60;
         const display = document.getElementById('timerDisplay');
         if (display) display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        const circumference = 2 * Math.PI * 90;
-        const progress = ((appData.timerSeconds / (45 * 60)) * circumference);
+        
+        const circumference = 2 * Math.PI * 110;
+        const totalSeconds = 45 * 60;
+        const progress = circumference - (appData.timerSeconds / totalSeconds) * circumference;
         const progressCircle = document.getElementById('timerProgress');
         if (progressCircle) progressCircle.style.strokeDashoffset = progress;
     }
 
-    // ========== التقويم ==========
+    // ========== التقويم المصحح ==========
     function renderCalendar() {
         const year = appData.currentDate.getFullYear();
         const month = appData.currentDate.getMonth();
-        const monthNames = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        
+        const monthNames = ['يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
+                           'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
         document.getElementById('monthDisplay').textContent = `${monthNames[month]} ${year}`;
+        
+        // اليوم الأول من الشهر (0 = الأحد, 1 = الاثنين, ...)
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
-        let html = '';
-        for (let i = 0; i < firstDay; i++) html += '<div></div>';
-        for (let day = 1; day <= daysInMonth; day++) {
-            const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
-            html += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
+        
+        // أيام الشهر السابق
+        const prevMonthDays = new Date(year, month, 0).getDate();
+        
+        let daysHTML = '';
+        
+        // إضافة أيام الشهر السابق
+        for (let i = firstDay - 1; i >= 0; i--) {
+            daysHTML += `<div class="calendar-day other-month">${prevMonthDays - i}</div>`;
         }
-        document.getElementById('calendarDays').innerHTML = html;
+        
+        // إضافة أيام الشهر الحالي
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isToday = today.getDate() === day && 
+                           today.getMonth() === month && 
+                           today.getFullYear() === year;
+            daysHTML += `<div class="calendar-day ${isToday ? 'today' : ''}">${day}</div>`;
+        }
+        
+        // إضافة أيام الشهر التالي لإكمال الشبكة (6 صفوف كحد أقصى)
+        const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+        const remainingCells = totalCells - (firstDay + daysInMonth);
+        for (let i = 1; i <= remainingCells; i++) {
+            daysHTML += `<div class="calendar-day other-month">${i}</div>`;
+        }
+        
+        document.getElementById('calendarDays').innerHTML = daysHTML;
     }
 
     function navigateMonth(delta) {
@@ -1092,13 +1195,11 @@
 
     // ========== تحديث الواجهة الرئيسية ==========
     function updateMainUI() {
-        // إحصائيات
         document.getElementById('totalTasks').textContent = appData.tasks.length;
         document.getElementById('doneTasks').textContent = appData.tasks.filter(t => t.completed).length;
         document.getElementById('pointsDisplay').textContent = appData.points;
         document.getElementById('levelDisplay').textContent = appData.level;
         
-        // حساب السلسلة
         let streak = 0;
         const today = new Date().toISOString().split('T')[0];
         for (let i = 0; i < 365; i++) {
@@ -1112,7 +1213,6 @@
         }
         document.getElementById('streakDays').textContent = streak;
         
-        // مهام اليوم
         const todayTasks = appData.tasks.filter(t => t.date === today && !t.completed);
         const preview = document.getElementById('todayTasksPreview');
         if (preview) {
@@ -1125,7 +1225,6 @@
             `).join('');
         }
         
-        // العادات
         const habitsPreview = document.getElementById('habitsPreview');
         if (habitsPreview) {
             const todayHabits = appData.habits.filter(h => h.dates && h.dates.includes(today));
@@ -1138,20 +1237,17 @@
             `).join('');
         }
         
-        // الترحيب
         const greetingEl = document.getElementById('greetingTitle');
         if (greetingEl && appData.userProfile) {
             greetingEl.innerHTML = `${t('greeting')} ${escapeHtml(appData.userProfile.name)}! 👋`;
         }
         
-        // التاريخ
-        document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString(appData.language === 'ar' ? 'ar-SA' : 'en-US');
-        
-        // الصورة الشخصية
         const avatarImg = document.getElementById('userAvatar');
         if (avatarImg && appData.userProfile?.profileImage) {
             avatarImg.src = appData.userProfile.profileImage;
         }
+        
+        updateClock();
     }
 
     // ========== التنقل ==========
@@ -1196,8 +1292,18 @@
 
     // ========== بناء التطبيق الرئيسي ==========
     function buildMainApp() {
+        const weekDays = t('weekDays');
+        
         document.getElementById('root').innerHTML = `
             <div class="app-container">
+                <!-- شريط المعلومات العلوي -->
+                <div class="info-bar">
+                    <div class="time-box">
+                        <div class="clock" id="clock">--:--:--</div>
+                        <div class="date-arabic" id="dateArabic"></div>
+                    </div>
+                </div>
+
                 <nav class="bottom-nav">
                     <button class="nav-item ${appData.currentTab === 'home' ? 'active' : ''}" data-tab="home" onclick="switchTab('home')">
                         <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></div>
@@ -1225,7 +1331,6 @@
                     <header class="page-header">
                         <div class="greeting">
                             <h2 id="greetingTitle">${t('greeting')}! 👋</h2>
-                            <p class="date-display" id="dateDisplay"></p>
                         </div>
                         <div class="avatar" onclick="logout()">
                             <img id="userAvatar" src="${appData.userProfile?.profileImage || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'%3E%3Cpath fill=\'%236C5CE7\' d=\'M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .66.54 1.2 1.2 1.2h16.8c.66 0 1.2-.54 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z\'/%3E%3C/svg%3E'}">
@@ -1282,19 +1387,35 @@
                 <div class="page" id="calendar-page">
                     <div class="calendar-hero">
                         <div class="calendar-nav">
-                            <button class="btn-icon" onclick="navigateMonth(-1)">‹</button>
+                            <button onclick="navigateMonth(-1)">‹</button>
                             <h3 id="monthDisplay"></h3>
-                            <button class="btn-icon" onclick="navigateMonth(1)">›</button>
+                            <button onclick="navigateMonth(1)">›</button>
                         </div>
-                        <div class="calendar-weekdays">أحد إثنين ثلاثاء أربعاء خميس جمعة سبت</div>
+                        <div class="calendar-weekdays">
+                            <span>${weekDays[0]}</span>
+                            <span>${weekDays[1]}</span>
+                            <span>${weekDays[2]}</span>
+                            <span>${weekDays[3]}</span>
+                            <span>${weekDays[4]}</span>
+                            <span>${weekDays[5]}</span>
+                            <span>${weekDays[6]}</span>
+                        </div>
                         <div class="calendar-days" id="calendarDays"></div>
                     </div>
+                </div>
+
+                <!-- اسم المطور -->
+                <div class="developer-credit">
+                    ${t('developer')} <span>AYMEN HAFRAD</span>
                 </div>
             </div>
         `;
         updateMainUI();
         renderCalendar();
         updateTimerDisplay();
+        
+        setInterval(updateClock, 1000);
+        updateClock();
     }
 
     // ========== بناء صفحة التسجيل ==========
