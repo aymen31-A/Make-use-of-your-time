@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#6C5CE7">
     
-    <!-- أيقونة الموقع - تستخدم logo.png الذي صممته -->
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
     <title>TaskFlow - استغل وقتك</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    
     <style>
         * {
             margin: 0;
@@ -47,6 +47,158 @@
         body.theme-sunset { background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); }
         body.theme-forest { background: linear-gradient(135deg, #134e5e 0%, #71b280 100%); }
 
+        /* ========== صفحة تسجيل الدخول المحسنة ========== */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            max-width: 450px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 48px;
+            padding: 40px 32px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.5s ease;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo-img {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.3);
+        }
+
+        .login-logo-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .login-logo h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #6C5CE7, #a29bfe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .login-logo p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .login-input-group {
+            margin-bottom: 20px;
+        }
+
+        .login-input-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #eee;
+            border-radius: 20px;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .sync-status {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f0f0f8;
+            border-radius: 16px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .sync-status.online {
+            background: rgba(0, 184, 148, 0.1);
+            color: var(--success);
+        }
+
+        .sync-status.offline {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--danger);
+        }
+
+        .reminder-settings {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .reminder-time {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .reminder-time input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        .small-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
         .app-container {
             max-width: 500px;
             margin: 0 auto;
@@ -57,7 +209,6 @@
             padding-bottom: 85px;
         }
 
-        /* ========== اللوجو الخاص بك ========== */
         .logo-wrapper {
             position: relative;
             display: inline-block;
@@ -80,10 +231,8 @@
         .logo-container:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(108, 92, 231, 0.25);
-            border-color: rgba(108, 92, 231, 0.4);
         }
 
-        /* صورة اللوجو - زوايا منحرفة مثل favicon */
         .logo-icon {
             width: 40px;
             height: 40px;
@@ -98,13 +247,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
-            transition: transform 0.3s ease;
             border-radius: 14px;
-        }
-
-        .logo-container:hover .logo-icon img {
-            transform: rotate(5deg) scale(1.05);
         }
 
         .logo-text {
@@ -119,18 +262,14 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
         }
 
         .logo-title-en {
             font-size: 9px;
             color: #999;
             font-weight: 600;
-            letter-spacing: 1px;
         }
 
-        /* شريط المعلومات العلوي */
         .info-bar {
             background: var(--glass);
             backdrop-filter: blur(20px);
@@ -155,13 +294,11 @@
             font-weight: 800;
             color: var(--primary);
             font-family: monospace;
-            letter-spacing: 2px;
         }
 
         .time-box .date-arabic {
             font-size: 11px;
             color: #666;
-            margin-top: 3px;
         }
 
         .bottom-nav {
@@ -230,11 +367,6 @@
             fill: white;
         }
 
-        .nav-item span {
-            font-size: 11px;
-            font-weight: 600;
-        }
-
         .page {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -246,6 +378,11 @@
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -283,24 +420,13 @@
             border: 3px solid white;
             cursor: pointer;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
         .avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center;
-            display: block;
         }
 
         .quick-stats {
@@ -386,7 +512,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: all 0.2s;
         }
 
         .task-checkbox.checked {
@@ -435,11 +560,6 @@
             gap: 16px;
             color: white;
             position: relative;
-            transition: all 0.2s;
-        }
-
-        .habit-card:active {
-            transform: scale(0.98);
         }
 
         .habit-info {
@@ -468,7 +588,6 @@
             justify-content: center;
             color: white;
             font-size: 18px;
-            transition: all 0.2s;
         }
 
         .habit-check.done {
@@ -534,7 +653,6 @@
             color: white;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .preset-btn.active {
@@ -559,17 +677,6 @@
             text-align: center;
             font-size: 16px;
             font-weight: 700;
-            font-family: monospace;
-        }
-
-        .custom-timer button {
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
         }
 
         .btn-primary {
@@ -582,11 +689,6 @@
             font-size: 16px;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.96);
         }
 
         .btn-icon {
@@ -627,11 +729,6 @@
             color: var(--primary);
         }
 
-        .calendar-nav h3 {
-            font-size: 18px;
-            font-weight: 800;
-        }
-
         .calendar-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -660,12 +757,6 @@
             cursor: pointer;
             font-weight: 500;
             font-size: 14px;
-            background: transparent;
-            transition: all 0.2s;
-        }
-
-        .calendar-day:hover {
-            background: rgba(108, 92, 231, 0.1);
         }
 
         .calendar-day.today {
@@ -689,12 +780,6 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            animation: fadeInModal 0.3s ease;
-        }
-
-        @keyframes fadeInModal {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .modal.show {
@@ -708,13 +793,7 @@
             border-radius: 32px;
             padding: 0;
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            animation: slideUp 0.3s ease;
             overflow: hidden;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
@@ -729,7 +808,6 @@
         .modal-header h3 {
             font-size: 24px;
             font-weight: 800;
-            margin: 0;
         }
 
         .modal-header button {
@@ -741,44 +819,12 @@
             font-size: 20px;
             cursor: pointer;
             color: white;
-            transition: all 0.2s;
-        }
-
-        .modal-header button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
         }
 
         .modal-body {
             padding: 24px;
             max-height: 65vh;
             overflow-y: auto;
-        }
-
-        .modal-body::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .modal-body::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .modal-body::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(108, 92, 231, 0.2);
         }
 
         .avatar-grid {
@@ -796,17 +842,11 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .avatar-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2);
         }
 
         .avatar-card.selected {
             border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1));
+            background: rgba(108, 92, 231, 0.1);
         }
 
         .avatar-card img {
@@ -814,27 +854,14 @@
             height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            object-position: center;
             margin-bottom: 8px;
             border: 3px solid #e0e0e0;
-        }
-
-        .avatar-card.selected img {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
-        }
-
-        .avatar-card .avatar-name {
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
         }
 
         .theme-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 16px;
         }
 
         .theme-card {
@@ -849,11 +876,6 @@
             gap: 12px;
         }
 
-        .theme-card:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
         .theme-card.selected {
             border-color: var(--primary);
             background: rgba(108, 92, 231, 0.05);
@@ -863,27 +885,6 @@
             width: 40px;
             height: 40px;
             border-radius: 12px;
-        }
-
-        .theme-info {
-            flex: 1;
-        }
-
-        .theme-name {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--dark);
-        }
-
-        .theme-desc {
-            font-size: 11px;
-            color: #999;
-        }
-
-        .check-mark {
-            color: var(--primary);
-            font-size: 20px;
-            font-weight: bold;
         }
 
         .toast {
@@ -915,11 +916,6 @@
             border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .developer-credit span {
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
         .stat-row {
             display: flex;
             justify-content: space-between;
@@ -937,25 +933,14 @@
             }
             .avatar-grid {
                 grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
-                gap: 12px;
             }
             .avatar-card img {
                 width: 50px;
                 height: 50px;
             }
-            .logo-title-ar {
-                font-size: 14px;
-            }
             .logo-icon {
                 width: 32px;
                 height: 32px;
-                border-radius: 10px;
-            }
-            .logo-icon img {
-                border-radius: 10px;
-            }
-            .logo-container {
-                padding: 4px 10px;
             }
         }
     </style>
@@ -965,6 +950,167 @@
 <div id="root"></div>
 
 <script>
+    // ========== إعدادات التذكيرات اليومية ==========
+    let reminderInterval = null;
+    let reminderTime = localStorage.getItem('reminderTime') || '09:00';
+    
+    // بدء التذكيرات اليومية
+    function startDailyReminder() {
+        if (reminderInterval) clearInterval(reminderInterval);
+        
+        function checkReminder() {
+            const now = new Date();
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            if (currentTime === reminderTime) {
+                showDailyReminderNotification();
+            }
+        }
+        
+        // فحص كل دقيقة
+        reminderInterval = setInterval(checkReminder, 60000);
+        checkReminder();
+    }
+    
+    function showDailyReminderNotification() {
+        const pendingTasks = appData.tasks.filter(t => !t.completed);
+        const message = pendingTasks.length > 0 
+            ? `لديك ${pendingTasks.length} مهام لم تكتمل اليوم. حان وقت إنجازها! 💪`
+            : `ممتاز! كل مهامك مكتملة اليوم. حان وقت عادة جديدة! 🌟`;
+        
+        if (notificationManager.permissionGranted) {
+            notificationManager.showNotification('⏰ تذكير يومي', message, true);
+        }
+        
+        showToast(`⏰ ${message}`, false);
+    }
+    
+    function setReminderTime(time) {
+        reminderTime = time;
+        localStorage.setItem('reminderTime', time);
+        startDailyReminder();
+        showToast(`✅ تم ضبط التذكير اليومي على الساعة ${time}`, false);
+    }
+
+    // ========== نظام المزامنة باستخدام GitHub Gist API ==========
+    let syncEnabled = localStorage.getItem('syncEnabled') === 'true';
+    let githubToken = localStorage.getItem('githubToken') || '';
+    let githubGistId = localStorage.getItem('githubGistId') || '';
+    
+    async function syncToCloud() {
+        if (!syncEnabled || !githubToken || !githubGistId) {
+            showToast('⚠️ يرجى تفعيل المزامنة أولاً', false);
+            return false;
+        }
+        
+        try {
+            const data = {
+                tasks: appData.tasks,
+                habits: appData.habits,
+                points: appData.points,
+                level: appData.level,
+                totalFocusMinutes: appData.totalFocusMinutes,
+                totalTasksCompleted: appData.totalTasksCompleted,
+                lastSync: new Date().toISOString()
+            };
+            
+            const response = await fetch(`https://api.github.com/gists/${githubGistId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    files: {
+                        'taskflow_data.json': {
+                            content: JSON.stringify(data, null, 2)
+                        }
+                    }
+                })
+            });
+            
+            if (response.ok) {
+                showToast('✅ تمت المزامنة مع السحابة بنجاح', false);
+                updateSyncStatus(true);
+                return true;
+            } else {
+                throw new Error('Sync failed');
+            }
+        } catch(e) {
+            console.error('Sync error:', e);
+            showToast('❌ فشلت المزامنة، تحقق من الاتصال', false);
+            updateSyncStatus(false);
+            return false;
+        }
+    }
+    
+    async function loadFromCloud() {
+        if (!syncEnabled || !githubToken || !githubGistId) {
+            return false;
+        }
+        
+        try {
+            const response = await fetch(`https://api.github.com/gists/${githubGistId}`);
+            if (response.ok) {
+                const data = await response.json();
+                const content = data.files['taskflow_data.json']?.content;
+                if (content) {
+                    const cloudData = JSON.parse(content);
+                    
+                    // مقارنة التواريخ لاختيار الأحدث
+                    const localSync = localStorage.getItem('lastSync') || '1970-01-01';
+                    const cloudSync = cloudData.lastSync || '1970-01-01';
+                    
+                    if (cloudSync > localSync) {
+                        appData.tasks = cloudData.tasks || [];
+                        appData.habits = cloudData.habits || [];
+                        appData.points = cloudData.points || 0;
+                        appData.level = cloudData.level || 1;
+                        appData.totalFocusMinutes = cloudData.totalFocusMinutes || 0;
+                        appData.totalTasksCompleted = cloudData.totalTasksCompleted || 0;
+                        
+                        saveData();
+                        updateMainUI();
+                        renderTasksList();
+                        renderHabits();
+                        
+                        showToast('🔄 تم تحميل البيانات من السحابة', false);
+                    }
+                }
+            }
+            updateSyncStatus(true);
+            return true;
+        } catch(e) {
+            console.error('Load error:', e);
+            updateSyncStatus(false);
+            return false;
+        }
+    }
+    
+    function updateSyncStatus(isOnline) {
+        const statusEl = document.getElementById('syncStatus');
+        if (statusEl) {
+            statusEl.className = `sync-status ${isOnline ? 'online' : 'offline'}`;
+            statusEl.innerHTML = isOnline ? '🟢 المزامنة مفعلة' : '🔴 المزامنة غير متصلة';
+        }
+    }
+    
+    async function setupSync(token, gistId) {
+        githubToken = token;
+        githubGistId = gistId;
+        syncEnabled = true;
+        localStorage.setItem('syncEnabled', 'true');
+        localStorage.setItem('githubToken', token);
+        localStorage.setItem('githubGistId', gistId);
+        
+        await loadFromCloud();
+        showToast('✅ تم تفعيل المزامنة', false);
+        
+        // مزامنة تلقائية كل 5 دقائق
+        if (window.autoSyncInterval) clearInterval(window.autoSyncInterval);
+        window.autoSyncInterval = setInterval(() => syncToCloud(), 300000);
+    }
+
     // ========== قائمة الصور المتاحة ==========
     const availableAvatars = [
         { id: 1, src: 'logo1.png', name: 'صورة 1' },
@@ -1169,6 +1315,9 @@
     const soundManager = new SoundManager();
     const notificationManager = new NotificationManager();
 
+    // بدء التذكيرات
+    startDailyReminder();
+
     // ========== الترجمة ==========
     const translations = {
         ar: {
@@ -1190,7 +1339,8 @@
             developer: 'تطوير', weekDays: ['أحد', 'إثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'],
             customize: 'تخصيص', focusMinutes: 'دقائق تركيز', totalTasksDone: 'إجمالي المهام',
             chooseAvatar: 'اختر صورتك', themes: 'الثيمات', defaultTheme: 'الافتراضي', oceanTheme: 'المحيط',
-            sunsetTheme: 'الغروب', forestTheme: 'الغابة'
+            sunsetTheme: 'الغروب', forestTheme: 'الغابة', login: 'تسجيل الدخول', sync: 'مزامنة',
+            reminder: 'تذكير يومي'
         },
         en: {
             appName: 'Make Use of Your Time', navHome: 'Home', navTasks: 'Tasks', navTimer: 'Timer',
@@ -1211,7 +1361,8 @@
             developer: 'Developed by', weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             customize: 'Customize', focusMinutes: 'Focus minutes', totalTasksDone: 'Total tasks',
             chooseAvatar: 'Choose your avatar', themes: 'Themes', defaultTheme: 'Default', oceanTheme: 'Ocean',
-            sunsetTheme: 'Sunset', forestTheme: 'Forest'
+            sunsetTheme: 'Sunset', forestTheme: 'Forest', login: 'Login', sync: 'Sync',
+            reminder: 'Daily Reminder'
         }
     };
 
@@ -1249,6 +1400,12 @@
         localStorage.setItem('theme', appData.theme);
         localStorage.setItem('totalFocusMinutes', appData.totalFocusMinutes);
         localStorage.setItem('totalTasksCompleted', appData.totalTasksCompleted);
+        localStorage.setItem('lastSync', new Date().toISOString());
+        
+        // مزامنة تلقائية إذا كانت مفعلة
+        if (syncEnabled) {
+            setTimeout(() => syncToCloud(), 1000);
+        }
     }
 
     function addPoints(amount, showEffect = true) {
@@ -1444,7 +1601,7 @@
                     clearInterval(appData.timerInterval);
                     appData.timerRunning = false;
                     document.getElementById('timerBtn').innerHTML = t('startTimer');
-                    const minutesElapsed = Math.floor((45 * 60) / 60);
+                    const minutesElapsed = Math.floor((45 * 60 - appData.timerSeconds) / 60);
                     appData.totalFocusMinutes += minutesElapsed;
                     soundManager.playTimerEndSound();
                     notificationManager.showTimerCompleteNotification(minutesElapsed);
@@ -1605,6 +1762,94 @@
     function logout() { if (confirm(t('logoutConfirm'))) { localStorage.clear(); window.location.reload(); } }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
 
+    // صفحة تسجيل الدخول المحسنة
+    function showLoginPage() {
+        document.getElementById('root').innerHTML = `
+            <div class="login-wrapper">
+                <div class="login-card">
+                    <div class="login-logo">
+                        <div class="login-logo-img">
+                            <img src="logo.png" alt="TaskFlow">
+                        </div>
+                        <h1>${t('appName')}</h1>
+                        <p>نظم وقتك وحقق أهدافك</p>
+                    </div>
+                    
+                    <div class="login-input-group">
+                        <label>${t('fullName')}</label>
+                        <input type="text" id="loginName" class="login-input" placeholder="أدخل اسمك">
+                    </div>
+                    
+                    <div class="login-input-group">
+                        <label>${t('age')}</label>
+                        <input type="number" id="loginAge" class="login-input" placeholder="مثال: 25">
+                    </div>
+                    
+                    <button class="login-btn" onclick="handleLogin()">${t('startJourney')} 🚀</button>
+                    
+                    <div class="reminder-settings">
+                        <label>⏰ ${t('reminder')}</label>
+                        <div class="reminder-time">
+                            <input type="time" id="reminderTimeInput" value="${reminderTime}">
+                            <button class="small-btn" onclick="setReminderTime(document.getElementById('reminderTimeInput').value)">ضبط</button>
+                        </div>
+                    </div>
+                    
+                    <div class="sync-status offline" id="syncStatus">
+                        🔴 المزامنة غير مفعلة
+                    </div>
+                    
+                    <div class="reminder-settings">
+                        <label>☁️ ${t('sync')} (GitHub Gist)</label>
+                        <div class="reminder-time">
+                            <input type="text" id="githubToken" placeholder="GitHub Token" style="flex:2">
+                            <input type="text" id="gistId" placeholder="Gist ID" style="flex:1">
+                            <button class="small-btn" onclick="setupSync(document.getElementById('githubToken').value, document.getElementById('gistId').value)">تفعيل</button>
+                        </div>
+                        <p style="font-size:10px; color:#999; margin-top:8px;">
+                            📌 للحصول على Token: GitHub Settings → Developer settings → Personal access tokens
+                        </p>
+                    </div>
+                    
+                    <div class="lang-bar" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                        <button class="lang-btn ${appData.language === 'ar' ? 'active' : ''}" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+                        <button class="lang-btn ${appData.language === 'en' ? 'active' : ''}" onclick="setLanguage('en')">🇬🇧 English</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // تحميل إعدادات المزامنة المحفوظة
+        const savedToken = localStorage.getItem('githubToken');
+        const savedGistId = localStorage.getItem('githubGistId');
+        if (savedToken) document.getElementById('githubToken').value = savedToken;
+        if (savedGistId) document.getElementById('gistId').value = savedGistId;
+        
+        updateSyncStatus(syncEnabled);
+    }
+    
+    function handleLogin() {
+        const name = document.getElementById('loginName')?.value.trim();
+        const age = document.getElementById('loginAge')?.value;
+        
+        if (!name) { alert(t('enterName')); return; }
+        if (!age || age < 1 || age > 120) { alert(t('enterAge')); return; }
+        
+        appData.userProfile = { name: name, age: parseInt(age), goals: [], language: appData.language };
+        appData.onboarded = true;
+        localStorage.setItem('userProfile', JSON.stringify(appData.userProfile));
+        localStorage.setItem('onboarded', 'true');
+        
+        showToast(`${t('welcome')} ${name}! 🎉`, true);
+        setTimeout(() => { buildMainApp(); }, 500);
+    }
+    
+    function setLanguage(lang) {
+        appData.language = lang;
+        localStorage.setItem('appLanguage', lang);
+        showLoginPage();
+    }
+
     function buildMainApp() {
         applyTheme();
         const weekDays = t('weekDays');
@@ -1744,84 +1989,17 @@
         setInterval(updateClock, 1000);
         updateClock();
         setTimeout(() => { if (Notification.permission === 'default') notificationManager.initNotifications(); }, 2000);
-    }
-
-    // ========== صفحة التسجيل ==========
-    let selectedGoals = [];
-    let profileImageData = null;
-
-    function renderOnboardingGoals() {
-        const goalsList = appData.language === 'ar' 
-            ? [{emoji:"📚",text:"دراسة"},{emoji:"🏃",text:"رياضة"},{emoji:"⏰",text:"تنظيم الوقت"},{emoji:"🌱",text:"تطوير ذات"},{emoji:"💼",text:"عمل"},{emoji:"🎨",text:"إبداع"}]
-            : [{emoji:"📚",text:"Study"},{emoji:"🏃",text:"Sports"},{emoji:"⏰",text:"Time Management"},{emoji:"🌱",text:"Self Growth"},{emoji:"💼",text:"Work"},{emoji:"🎨",text:"Creativity"}];
-        const container = document.getElementById('onboardingGoalsGrid');
-        if (!container) return;
-        container.innerHTML = '';
-        goalsList.forEach(goal => {
-            const div = document.createElement('div');
-            div.className = 'goal-card';
-            if (selectedGoals.includes(goal.text)) div.classList.add('selected');
-            div.innerHTML = `<span>${goal.emoji}</span> <span>${goal.text}</span>`;
-            div.onclick = () => {
-                if (selectedGoals.includes(goal.text)) {
-                    selectedGoals = selectedGoals.filter(g => g !== goal.text);
-                    div.classList.remove('selected');
-                } else {
-                    selectedGoals.push(goal.text);
-                    div.classList.add('selected');
-                }
-            };
-            container.appendChild(div);
-        });
-    }
-
-    function setLanguage(lang) { appData.language = lang; localStorage.setItem('appLanguage', lang); buildOnboarding(); }
-    function handleOnboardingFileUpload(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                profileImageData = e.target.result;
-                const img = document.getElementById('onboardingAvatarImg');
-                const placeholder = document.getElementById('onboardingAvatarPlaceholder');
-                if (img && placeholder) { img.src = profileImageData; img.style.display = 'block'; placeholder.style.display = 'none'; }
-            };
-            reader.readAsDataURL(input.files[0]);
+        
+        // تحميل البيانات من السحابة إذا كانت المزامنة مفعلة
+        if (syncEnabled) {
+            setTimeout(() => loadFromCloud(), 1000);
         }
-    }
-    function handleOnboardingUrlImage() {
-        const url = prompt(appData.language === 'ar' ? 'أدخل رابط الصورة:' : 'Enter image URL:');
-        if (url && (url.startsWith('http') || url.startsWith('data'))) {
-            profileImageData = url;
-            const img = document.getElementById('onboardingAvatarImg');
-            const placeholder = document.getElementById('onboardingAvatarPlaceholder');
-            if (img && placeholder) { img.src = url; img.style.display = 'block'; placeholder.style.display = 'none'; }
-        }
-    }
-    function completeRegistration() {
-        const name = document.getElementById('onboardingName')?.value.trim();
-        const age = document.getElementById('onboardingAge')?.value;
-        if (!name) { alert(t('enterName')); return; }
-        if (!age || age < 1 || age > 120) { alert(t('enterAge')); return; }
-        if (selectedGoals.length === 0) { alert(t('selectGoal')); return; }
-        appData.userProfile = { name: name, age: parseInt(age), goals: selectedGoals, profileImage: profileImageData, language: appData.language };
-        appData.onboarded = true;
-        localStorage.setItem('userProfile', JSON.stringify(appData.userProfile));
-        localStorage.setItem('onboarded', 'true');
-        if (profileImageData) localStorage.setItem('userProfileImage', profileImageData);
-        showToast(`${t('welcome')} ${name}! 🎉`, true);
-        setTimeout(() => { buildMainApp(); }, 500);
-    }
-    function buildOnboarding() {
-        document.getElementById('root').innerHTML = `
-            <div class="onboarding-wrapper"><div class="onboarding-card"><div class="lang-bar"><button class="lang-btn ${appData.language === 'ar' ? 'active' : ''}" onclick="setLanguage('ar')">🇸🇦 العربية</button><button class="lang-btn ${appData.language === 'en' ? 'active' : ''}" onclick="setLanguage('en')">🇬🇧 English</button></div><div class="form-content"><div class="logo-area"><h1>${t('appName')}</h1></div><div class="avatar-section"><div class="avatar-preview" id="onboardingAvatarPreview" onclick="document.getElementById('onboardingFileInput').click()"><div class="avatar-placeholder" id="onboardingAvatarPlaceholder">📸</div><img id="onboardingAvatarImg" style="display:none; width:100%; height:100%; object-fit:cover;"></div><input type="file" id="onboardingFileInput" accept="image/*" style="display:none" onchange="handleOnboardingFileUpload(this)"><div class="avatar-actions"><button class="avatar-btn" onclick="document.getElementById('onboardingFileInput').click()">📁 ${appData.language === 'ar' ? 'رفع صورة' : 'Upload'}</button><button class="avatar-btn" onclick="handleOnboardingUrlImage()">🔗 ${appData.language === 'ar' ? 'رابط الصورة' : 'Image URL'}</button></div></div><div class="input-group"><label>${t('fullName')}</label><input type="text" id="onboardingName" class="input-field" placeholder="${appData.language === 'ar' ? 'أدخل اسمك' : 'Enter your name'}"></div><div class="input-group"><label>${t('age')}</label><input type="number" id="onboardingAge" class="input-field" placeholder="${appData.language === 'ar' ? 'مثال: 25' : 'e.g., 25'}"></div><div class="input-group"><label>${t('goals')}</label><div class="goals-grid" id="onboardingGoalsGrid"></div></div><button class="submit-btn" onclick="completeRegistration()">${t('startJourney')}</button></div></div></div>
-        `;
-        renderOnboardingGoals();
     }
 
     window.onload = () => {
         applyTheme();
         if (appData.onboarded && appData.userProfile) { buildMainApp(); } 
-        else { buildOnboarding(); }
+        else { showLoginPage(); }
     };
 </script>
 </body>
